@@ -55,15 +55,25 @@ p {
     flex-direction: column;
     width: 200px;
     border-radius: 5px;
+    border: 1px solid gray;
+    text-align: center;
     overflow: hidden;
     margin: 20px 0;
 }
-img {
+
+/* img {
     max-width: 100%;
     height: auto
+} */
+
+.product-item img {
+    display: block;
+    height: 200px;
+    object-fit: contain;
 }
+
 .desc {
-    border: 1px solid #c0c0c040;
+    /* border: 1px solid #c0c0c040; */
     padding: 15px
 }
 .cart{

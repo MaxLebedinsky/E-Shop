@@ -1,4 +1,5 @@
 const API = 'https://my-json-server.typicode.com/MaxLebedinsky/JSON_for_E-shop';
+const IMAGES_FOLDER = './images/';
 
 class List {
     constructor(url, container, list = list2){
@@ -51,22 +52,25 @@ class List {
 }
 
 class Item{
-    constructor(el, img = 'http://dummyimage.com/150x200'){
+    
+    // constructor(el, img = 'http://dummyimage.com/150x200'){
+        constructor(el, photo = 'libtech-snowboard.jpg'){
         this.product_name = el.product_name;
         this.price = el.price;
         this.id_product = el.id_product;
-        this.img = img;
+        this.photo = el.photo;
     }
     render(){
         return `<div class="product-item" data-id="${this.id_product}">
-                <img src="${this.img}" alt="Some img">
+                <img src="${IMAGES_FOLDER}${this.photo}" alt="Some img">
                 <div class="desc">
                     <h3>${this.product_name}</h3>
                     <p>${this.price} $</p>
                     <button class="buy-btn"
                     data-id="${this.id_product}"
                     data-name="${this.product_name}"
-                    data-price="${this.price}">Купить</button>
+                    data-price="${this.price}"
+                    data-image="${this.photo}">Купить</button>
                 </div>
             </div>`
     }
@@ -117,6 +121,7 @@ class Cart extends List{
                             id_product: productId,
                             price: +element.dataset['price'],
                             product_name: element.dataset['name'],
+                            photo: element.dataset['image'],
                             quantity: 1
                         };
                         this.goods = [product];
@@ -164,14 +169,15 @@ class Cart extends List{
 }
 
 class CartItem extends Item{
-    constructor(el, img = 'http://dummyimage.com/50x75'){
-        super(el, img);
+    // constructor(el, photo = 'http://dummyimage.com/50x75'){
+        constructor(el){
+        super(el);
         this.quantity = el.quantity;
     }
     render(){
     return `<div class="cart-item" data-id="${this.id_product}">
             <div class="product-bio">
-            <img src="${this.img}" alt="Some image">
+            <img src="${IMAGES_FOLDER}${this.photo}" alt="Some image" width="50">
             <div class="product-desc">
             <p class="product-title">${this.product_name}</p>
             <p class="product-quantity">Quantity: ${this.quantity}</p>
