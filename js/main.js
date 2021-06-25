@@ -29,7 +29,7 @@ class List {
         const block = document.querySelector(this.container);
         for (let product of this.goods){
             const productObj = new this.list[this.constructor.name](product);
-            console.log(productObj);
+            // console.log(productObj);
             this.allProducts.push(productObj);
             block.insertAdjacentHTML('beforeend', productObj.render());
         }
@@ -65,7 +65,7 @@ class Item{
                 <img src="${IMAGES_FOLDER}${this.photo}" alt="Some img">
                 <div class="desc">
                     <h3>${this.product_name}</h3>
-                    <p>${this.price} $</p>
+                    <p>$${this.price}</p>
                     <button class="buy-btn"
                     data-id="${this.id_product}"
                     data-name="${this.product_name}"
@@ -108,13 +108,11 @@ class Cart extends List{
             });
     }
     addProduct(element){
-        // this.getJson(`${API}/addToBasket.json`)
-        //     .then(data => {
-        //         if(data.result === 1){
                     let productId = +element.dataset['id'];
                     let find = this.allProducts.find(product => product.id_product === productId);
                     if(find){
                         find.quantity++;
+                        // console.log('find: ', find);
                         this._updateCart(find);
                     } else {
                         let product = {
@@ -127,31 +125,34 @@ class Cart extends List{
                         this.goods = [product];
                         this.render();
                     }
-            //     } else {
-            //         alert('Error');
-            //     }
-            // })
+                    // console.log('after add: ', this.allProducts);
     }
-    removeProduct(element){
-        // this.getJson(`${API}/deleteFromBasket.json`)
-        //     .then(data => {
-        //         if(data.result === 1){
+    decreaseProduct(element){
                     let productId = +element.dataset['id'];
                     let find = this.allProducts.find(product => product.id_product === productId);
                     if(find.quantity > 1){
                         find.quantity--;
                         this._updateCart(find);
                     } else {
-                        this.allProducts.splice(this.allProducts.indexOf(find), 1);
-                        document.querySelector(`.cart-item[data-id="${productId}"]`).remove();
+                        // this.allProducts.splice(this.allProducts.indexOf(find), 1);
+                        // document.querySelector(`.cart-item[data-id="${productId}"]`).remove();
+                        // if(!this.allProducts.length) {console.log('Cart is empty')};
+                        this.deleteProduct(element);
                     }
-                // } else {
-                //     alert('Error');
-                // }
-            // })
+                    // console.log('after decrease: ', this.allProducts);
+    }
+    deleteProduct(element){
+                    let productId = +element.dataset['id'];
+                    // console.log('productId: ', productId);
+                    let find = this.allProducts.find(product => product.id_product === productId);
+                    this.allProducts.splice(this.allProducts.indexOf(find), 1);
+                    document.querySelector(`.cart-item[data-id="${productId}"]`).remove();
+                    if(!this.allProducts.length) {console.log('Cart is empty')};
+                    // console.log('after delete: ', this.allProducts);
     }
     _updateCart(product){
        let block = document.querySelector(`.cart-item[data-id="${product.id_product}"]`);
+    //    console.log(block);
        block.querySelector('.product-quantity').textContent = `Quantity: ${product.quantity}`;
        block.querySelector('.product-price').textContent = `$${product.quantity*product.price}`;
     }
@@ -160,10 +161,20 @@ class Cart extends List{
             document.querySelector(this.container).classList.toggle('invisible');
         });
         document.querySelector(this.container).addEventListener('click', e => {
-           if(e.target.classList.contains('del-btn')){
-               this.removeProduct(e.target);
+           if(e.target.classList.contains('minus-btn')){
+               this.decreaseProduct(e.target);
            }
-        })
+        });
+        document.querySelector(this.container).addEventListener('click', e => {
+            if(e.target.classList.contains('plus-btn')){
+                this.addProduct(e.target);
+            }
+        });
+        document.querySelector(this.container).addEventListener('click', e => {
+            if(e.target.classList.contains('del-btn')){
+                this.deleteProduct(e.target);
+            }
+        });
     }
 
 }
@@ -186,6 +197,8 @@ class CartItem extends Item{
         </div>
         <div class="right-block">
             <p class="product-price">$${this.quantity*this.price}</p>
+            <button class="minus-btn" data-id="${this.id_product}">-</button>
+            <button class="plus-btn" data-id="${this.id_product}">+</button>
             <button class="del-btn" data-id="${this.id_product}">&times;</button>
         </div>
         </div>`
