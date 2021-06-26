@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Интернет-магазин</title>
+    <title>E-Shop on OOP</title>
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -19,11 +19,17 @@
                 </button>
             </form>
             <button class="btn-cart" type="button">Корзина</button>
-            <div class="cart-block invisible"></div>
+            <div class="cart-block invisible">
+                <button class="btn-close">&times;</button>
+                <div class="cart-empty invisible">Корзина пуста</div>
+                <div class="cart-block-content"></div>
+                <div class="cart-total"></div>
+            </div>
         </div>
     </header>
     <main>
         <div class="products"></div>
+        <div class="layover invisible"></div>
     </main>
     <script defer src="https://use.fontawesome.com/releases/v5.7.2/js/all.js"
         integrity="sha384-0pzryjIRos8mFBWMzSSZApWtPl/5++eIfzYmTgBBmXYdhvxPc+XcFEk+zJwDgWbP"
