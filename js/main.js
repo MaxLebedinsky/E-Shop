@@ -2,9 +2,9 @@ const API = 'https://my-json-server.typicode.com/MaxLebedinsky/JSON_for_E-shop';
 const IMAGES_FOLDER = './images/';
 
 class List {
-    constructor(url, container, list = list2){
+    constructor(url, container, dispatcher = DISPATCHER){
         this.container = container;
-        this.list = list;
+        this.dispatcher = dispatcher;
         this.url = url;
         this.goods = [];
         this.allProducts = [];
@@ -25,7 +25,7 @@ class List {
     render(){
         const block = document.querySelector(this.container);
         for (let product of this.goods){
-            const productObj = new this.list[this.constructor.name](product);
+            const productObj = new this.dispatcher[this.constructor.name](product);
             // console.log(productObj);
             this.allProducts.push(productObj);
             block.insertAdjacentHTML('beforeend', productObj.render());
@@ -55,23 +55,31 @@ class List {
 class Item{
     
     // constructor(el, img = 'http://dummyimage.com/150x200'){
-        constructor(el, photo = 'libtech-snowboard.jpg'){
+        constructor(el, photo = 'http://dummyimage.com/150x200'){
         this.product_name = el.product_name;
         this.price = el.price;
         this.id_product = el.id_product;
         this.photo = el.photo;
+        this.category = el.category;
+        this.brand = el.brand;
     }
     render(){
         return `<div class="product-item" data-id="${this.id_product}">
-                <img src="${IMAGES_FOLDER}${this.photo}" alt="Some img">
+                <img src="${IMAGES_FOLDER}${this.photo}" alt="${this.product_name}">
+                    <p class="category">${this.category}</p>
+                    <p class="brand">${this.brand}
                 <div class="desc">
                     <h3>${this.product_name}</h3>
-                    <p>$${this.price}</p>
-                    <button class="buy-btn"
-                    data-id="${this.id_product}"
-                    data-name="${this.product_name}"
-                    data-price="${this.price}"
-                    data-image="${this.photo}">Купить</button>
+                    <div class="item-total">
+                        <p class="price">$${this.price}</p>
+                        <button class="buy-btn"
+                        data-id="${this.id_product}"
+                        data-name="${this.product_name}"
+                        data-price="${this.price}"
+                        data-image="${this.photo}"
+                        data-brand="${this.brand}"
+                        data-category="${this.category}">В корзину</button>
+                    </div>
                 </div>
             </div>`
     }
@@ -110,6 +118,7 @@ class Cart extends List{
     }
     addProduct(element){
                     document.querySelector('.cart-empty').classList.add('invisible');
+                    document.querySelector('.cart-total').classList.remove('invisible');
                     let productId = +element.dataset['id'];
                     let find = this.allProducts.find(product => product.id_product === productId);
                     if(find){
@@ -122,6 +131,8 @@ class Cart extends List{
                             price: +element.dataset['price'],
                             product_name: element.dataset['name'],
                             photo: element.dataset['image'],
+                            brand: element.dataset['brand'],
+                            category: element.dataset['category'],
                             quantity: 1
                         };
                         this.goods = [product];
@@ -154,6 +165,7 @@ class Cart extends List{
                     if(!this.allProducts.length) {
                         console.log('Cart is empty');
                         document.querySelector('.cart-empty').classList.remove('invisible');
+                        document.querySelector('.cart-total').classList.add('invisible');
                     };
                     this.updateTotal();
                     // console.log('after delete: ', this.allProducts);
@@ -161,11 +173,11 @@ class Cart extends List{
     _updateCart(product){
        let block = document.querySelector(`.cart-item[data-id="${product.id_product}"]`);
     //    console.log(block);
-       block.querySelector('.product-quantity').textContent = `Quantity: ${product.quantity}`;
-       block.querySelector('.product-price').textContent = `$${product.quantity*product.price}`;
+       block.querySelector('.product-quantity').textContent = `${product.quantity}`;
+       block.querySelector('.product-price>span').textContent = `${product.quantity*product.price}`;
     }
     updateTotal() {
-        document.querySelector('.cart-total').innerHTML=`Total: ${this.calcSum()}`;
+        document.querySelector('.cart-total').innerHTML=`Общая стоимость товаров: $<span>${this.calcSum()}</span>`;
     }
     calcSum(){
         return this.allProducts.reduce((accum, item) => accum += item.price * item.quantity, 0);
@@ -181,10 +193,18 @@ class Cart extends List{
             }
             if(e.target.classList.contains('plus-btn')){
             this.addProduct(e.target);
+            console.log(e.target);
             }
+            // if(e.target.parentNode.classList.contains('del-btn')){
+            //     console.log(e.target.parentNode);
+            //     this.deleteProduct(e.target.parentNode);
+            // }
             if(e.target.classList.contains('del-btn')){
+                console.log(e.target);
                 this.deleteProduct(e.target);
             }
+            
+
             if(e.target.classList.contains('btn-close')){
                 document.querySelector('.cart-block').classList.toggle('invisible');
                 document.querySelector('.layover').classList.toggle('invisible');
@@ -206,25 +226,44 @@ class CartItem extends Item{
         this.quantity = el.quantity;
     }
     render(){
+    // return `<div class="cart-item" data-id="${this.id_product}">
+    //         <div class="product-bio">
+    //         <img src="${IMAGES_FOLDER}${this.photo}" alt="Some image" width="50">
+    //         <div class="product-desc">
+    //         <p class="product-title">${this.product_name}</p>
+    //         <p class="product-quantity">Quantity: ${this.quantity}</p>
+    //     <p class="product-single-price">$${this.price} each</p>
+    //     </div>
+    //     </div>
+    //     <div class="right-block">
+    //         <p class="product-price">$${this.quantity*this.price}</p>
+    //         <button class="minus-btn" data-id="${this.id_product}">-</button>
+    //         <button class="plus-btn" data-id="${this.id_product}">+</button>
+    //         <button class="del-btn" data-id="${this.id_product}">&times;</button>
+    //     </div>
+    //     </div>`
+    // }
     return `<div class="cart-item" data-id="${this.id_product}">
-            <div class="product-bio">
-            <img src="${IMAGES_FOLDER}${this.photo}" alt="Some image" width="50">
-            <div class="product-desc">
-            <p class="product-title">${this.product_name}</p>
-            <p class="product-quantity">Quantity: ${this.quantity}</p>
-        <p class="product-single-price">$${this.price} each</p>
-        </div>
-        </div>
-        <div class="right-block">
-            <p class="product-price">$${this.quantity*this.price}</p>
-            <button class="minus-btn" data-id="${this.id_product}">-</button>
-            <button class="plus-btn" data-id="${this.id_product}">+</button>
-            <button class="del-btn" data-id="${this.id_product}">&times;</button>
-        </div>
-        </div>`
-    }
+                
+                    <div class="cart-item-img"><img src="${IMAGES_FOLDER}${this.photo}" alt="${this.product_name}"></div>
+                    <div class="product-desc">
+                        <p><span>${this.category}</span> <span>${this.brand}</span></p>
+                        <p class="product-title">${this.product_name}</p>
+                    </div>
+                    <div class="product-single-price">Цена: $${this.price}</div>
+                
+                    <div class="right-block">
+                        <button class="minus-btn" data-id="${this.id_product}">-</button>
+                        <div class="product-quantity"> ${this.quantity} </div>
+                        <button class="plus-btn" data-id="${this.id_product}">+</button>
+                    </div>
+
+                <div class="product-price">Ст-ть: $<span>${this.quantity*this.price}<span></div>
+                <button class="del-btn" data-id="${this.id_product}">&times;</button>
+            </div>`
 }
-const list2 = {
+}
+const DISPATCHER = {
     ProductsList: ProductItem,
     Cart: CartItem
 };
